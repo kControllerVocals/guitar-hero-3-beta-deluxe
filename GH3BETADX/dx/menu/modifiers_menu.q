@@ -114,11 +114,6 @@ modifier_options = [
 		Description = "You can now gain star power while having it activated! (DISABLES SAVING)"
 	}
 	{
-		Name = "Prototype Star Power"
-		Id = PROTO_SP
-		Description = "Star Power popup from GH3 Prototype. May have problems in Multiplayer."
-	}
-	{
 		Name = "Show Early Timing"
 		Id = EARLY_TIMING
 		Description = "Guitar Hero 3 only destroys gems as soon as they cross the strikeline. No more!"
