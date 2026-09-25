@@ -318,10 +318,10 @@ endscript
 script practice_start_song \{device_num = 0}
 	change \{game_mode = training}
 	change \{current_transition = practice}
-	if (<black_background> = 0)
-		Change \{current_level = load_z_soundcheck}
+	if (<black_background> = 1)
+		Change \{current_level = load_z_viewer}
 	else
-		Change \{current_level = z_viewer}
+		Change \{current_level = load_z_soundcheck}
 	endif
 	start_song StartTime = ($practice_start_time) device_num = <device_num> practice_intro = 1 endtime = ($practice_end_time)
 	change \{practice_audio_muted = 0}
@@ -350,10 +350,10 @@ script quickplay_start_song device_num = 0
 	GetRandomValue a = 0 b = (<num_venues> -1) name = random_venue_index Integer
 	get_valid_venue_index venue_index = <random_venue_index>
 	get_LevelZoneArray_checksum index = <index>
-	if (<black_background> = 0)
-		Change current_level = <level_checksum>
-	else
+	if (<black_background> = 1)
 		Change current_level = z_viewer
+	else
+		Change current_level = <level_checksum>
 	endif
 	dx_reset_fc_counters
 	printstruct x = <...>
@@ -444,3 +444,39 @@ script GuitarEvent_UnnecessaryNote
 		Change fc_glowburst_anim_started = 2
 	endif
 endscript
+
+script dx_memcard_sequence_begin_autosave 
+	if ($dx_settings_changed = 1)
+		Change dx_settings_changed = 0
+	else
+		start_flow_manager \{flow_state = main_menu_fs}
+		return
+	endif
+	if ($enable_saving = 0)
+		start_flow_manager \{flow_state = main_menu_fs}
+		return
+	endif
+	if ($reenable_saving = 1)
+		handle_signin_changed
+		return
+	endif
+	SpawnScriptNow memcard_sequence_begin_autosave_logic Params = <...>
+endscript
+
+dx_menu_autosave_fs = {
+	Create = dx_memcard_sequence_begin_autosave
+	Destroy = memcard_sequence_cleanup_generic
+	actions = [
+		{
+			action = memcard_sequence_save_success
+			flow_state = main_menu_fs
+			transition_left
+		}
+		{
+			action = memcard_sequence_save_failed
+			flow_state = main_menu_fs
+			transition_left
+		}
+	]
+}
+
